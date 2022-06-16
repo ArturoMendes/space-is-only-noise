@@ -9,7 +9,6 @@ function App() {
 
   useLayoutEffect(() => {
     let onResize = () => {
-      console.log('on resize')
       setWindowWidth(window.innerWidth)
     }
 
@@ -20,7 +19,6 @@ function App() {
 
   useEffect(() => {
     if (analyser) {
-      console.log('something changed')
       const canvasCtx = audioSpaceRef.current.getContext('2d')
 
       let onAudio = () => {
