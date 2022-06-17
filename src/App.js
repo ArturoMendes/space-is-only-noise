@@ -6,10 +6,12 @@ function App() {
   const analyser = useDeviceAudio()
   const audioSpaceRef = useRef()
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
 
   useLayoutEffect(() => {
     let onResize = () => {
       setWindowWidth(window.innerWidth)
+      setWindowHeight(window.innerHeight)
     }
 
     window.addEventListener('resize', onResize)
@@ -25,20 +27,51 @@ function App() {
         requestAnimationFrame(onAudio)
         const canvasWidth = audioSpaceRef.current.width
         const canvasHeight = audioSpaceRef.current.height
-        
+
         const bufferLength = analyser.frequencyBinCount
         const dataArray = new Uint8Array(bufferLength)
-        const barWidth = canvasWidth / bufferLength
+
+        let pixelsPerSquare = Math.floor(
+          (canvasHeight * canvasWidth) / bufferLength
+        )
+
+        const baseSide = Math.sqrt(pixelsPerSquare)
+
+        const rows = Math.floor(canvasHeight / baseSide)
+        const rectHeight = canvasHeight / rows
+
+        const columns = Math.floor(bufferLength / rows)
+        const rectWidth = canvasWidth / columns
 
         analyser.getByteFrequencyData(dataArray)
 
         canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight)
-        canvasCtx.fillStyle = '#707f94'
 
-        for (let i = 0; i < bufferLength; i++) {
-          let barPosition = i * barWidth
-          let barHeight = dataArray[i]
-          canvasCtx.fillRect(barPosition, canvasHeight - barHeight/2, barWidth, barHeight)
+        // INFO: the loop defines how the frequencies are populated
+        let arrayIndex = 0
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < columns; j++) {
+            let rectY = i * rectHeight
+            let rectX = j * rectWidth
+
+            // TODO: use audioInput value in a better way
+            let audioInput = dataArray[arrayIndex]
+            
+            canvasCtx.fillStyle = `rgba(0, 0, ${audioInput}, ${audioInput ? 1 : 0})`
+            canvasCtx.fillRect(rectX, rectY, rectWidth, rectHeight)
+
+            if (process.env.NODE_ENV !== 'production') {
+              canvasCtx.textAlign = 'center'
+              canvasCtx.fillStyle = `rgb(255, 255, 255, ${audioInput ? 1 : 0})`
+              canvasCtx.fillText(
+                `${audioInput}`,
+                rectX + rectWidth / 2,
+                rectY + rectHeight / 2
+              )
+            }
+
+            arrayIndex++
+          }
         }
       }
 
@@ -52,6 +85,7 @@ function App() {
       <canvas
         ref={audioSpaceRef}
         width={windowWidth}
+        height={windowHeight}
         id="audio-space"
         style={{
           position: 'fixed',
