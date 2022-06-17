@@ -23,28 +23,28 @@ function App() {
 
       let onAudio = () => {
         requestAnimationFrame(onAudio)
-        const bars = 250
-        const barWidth = windowWidth / bars
-        const WIDTH = audioSpaceRef.current.width
-        const HEIGHT = audioSpaceRef.current.height
-
+        const canvasWidth = audioSpaceRef.current.width
+        const canvasHeight = audioSpaceRef.current.height
+        
         const bufferLength = analyser.frequencyBinCount
         const dataArray = new Uint8Array(bufferLength)
+        const barWidth = canvasWidth / bufferLength
+
         analyser.getByteFrequencyData(dataArray)
 
-        canvasCtx.clearRect(0, 0, WIDTH, HEIGHT)
+        canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight)
         canvasCtx.fillStyle = '#707f94'
 
-        for (let i = 0; i < bars; i++) {
+        for (let i = 0; i < bufferLength; i++) {
           let barPosition = i * barWidth
-          let barHeight = -(dataArray[i] / 2)
-          canvasCtx.fillRect(barPosition, HEIGHT, barWidth, barHeight)
+          let barHeight = dataArray[i]
+          canvasCtx.fillRect(barPosition, canvasHeight - barHeight/2, barWidth, barHeight)
         }
       }
 
       onAudio()
     }
-  }, [analyser, windowWidth])
+  }, [analyser])
 
   return (
     <div className="App">
