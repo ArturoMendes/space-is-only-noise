@@ -9,7 +9,7 @@ const greenMultiplier = Math.random()
 const blueMultiplier = Math.random()
 
 const getColorForFrequency = (frequency) => {
-  if (colorDict[frequency] == undefined) {
+  if (colorDict[frequency] === undefined) {
     let red = (frequency + 1) * redMultiplier
     let green = (frequency + 1) * greenMultiplier
     let blue = (frequency + 1) * blueMultiplier
