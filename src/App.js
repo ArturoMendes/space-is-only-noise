@@ -1,23 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import './App.css'
+import VisualizerSpace from './components/VisualizerSpace/VisualizerSpace'
 import useDeviceAudio from './hooks/useDeviceAudio'
 
 function App() {
   const analyser = useDeviceAudio()
   const audioSpaceRef = useRef()
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
-
-  useLayoutEffect(() => {
-    let onResize = () => {
-      setWindowWidth(window.innerWidth)
-      setWindowHeight(window.innerHeight)
-    }
-
-    window.addEventListener('resize', onResize)
-
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
 
   useEffect(() => {
     if (analyser) {
@@ -56,8 +44,10 @@ function App() {
 
             // TODO: use audioInput value in a better way
             let audioInput = dataArray[arrayIndex]
-            
-            canvasCtx.fillStyle = `rgba(0, 0, ${audioInput}, ${audioInput ? 1 : 0})`
+
+            canvasCtx.fillStyle = `rgba(0, 0, ${audioInput}, ${
+              audioInput ? 1 : 0
+            })`
             canvasCtx.fillRect(rectX, rectY, rectWidth, rectHeight)
 
             if (process.env.NODE_ENV !== 'production') {
@@ -82,17 +72,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">Space is only noise if you can see</header>
-      <canvas
-        ref={audioSpaceRef}
-        width={windowWidth}
-        height={windowHeight}
-        id="audio-space"
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-        }}
-      ></canvas>
+      <VisualizerSpace ref={audioSpaceRef} />
     </div>
   )
 }
