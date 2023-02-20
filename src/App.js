@@ -36,31 +36,36 @@ function App() {
         canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight)
 
         // INFO: the loop defines how the frequencies are populated
-        let arrayIndex = 0
+        let frequency = 0
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < columns; j++) {
             let rectY = i * rectHeight
             let rectX = j * rectWidth
 
             // TODO: use audioInput value in a better way
-            let audioInput = dataArray[arrayIndex]
+            let decibelValue = dataArray[frequency]
 
-            canvasCtx.fillStyle = `rgba(0, 0, ${audioInput}, ${
-              audioInput ? 1 : 0
+            // INFO: creates a grayscale representation 
+            let red = (frequency + 1) * 1
+            let green = (frequency + 1) * 1
+            let blue = (frequency + 1) * 1
+
+            canvasCtx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${
+              decibelValue / 100
             })`
             canvasCtx.fillRect(rectX, rectY, rectWidth, rectHeight)
 
             if (process.env.NODE_ENV !== 'production') {
               canvasCtx.textAlign = 'center'
-              canvasCtx.fillStyle = `rgb(255, 255, 255, ${audioInput ? 1 : 0})`
+              canvasCtx.fillStyle = `rgb(255, 255, 255)`
               canvasCtx.fillText(
-                `${audioInput}`,
+                `${decibelValue}`,
                 rectX + rectWidth / 2,
                 rectY + rectHeight / 2
               )
             }
 
-            arrayIndex++
+            frequency++
           }
         }
       }
